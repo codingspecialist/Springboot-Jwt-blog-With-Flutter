@@ -48,5 +48,10 @@ public class UserController {
 	public CMRespDto<?> userUpdate(@PathVariable Integer id, @RequestBody User user, @LoginUser User principal){
 		return new CMRespDto<>(1, "회원정보수정완료", userService.회원수정(id, user));
 	}
-
+	
+	@GetMapping("/init/user")
+	public CMRespDto<?> initUser(){
+		return new CMRespDto<>(1, "목록보기완료", userService.회원목록보기()); 
+	}
+	
 }

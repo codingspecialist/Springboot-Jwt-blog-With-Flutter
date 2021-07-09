@@ -22,7 +22,7 @@ public class PostController {
 	
 	private final PostService postService;
 	
-	@GetMapping({"/", "/post"})
+	@GetMapping("/post")
 	public CMRespDto<?> findAll(){
 		return new CMRespDto<>(1, "목록보기완료", postService.게시글목록보기());
 	}
@@ -48,5 +48,10 @@ public class PostController {
 	public CMRespDto<?> deleteById(@PathVariable Integer id){
 		postService.게시글삭제하기(id);
 		return new CMRespDto<>(1, "삭제하기완료", null);
+	}
+	
+	@GetMapping("/init/post")
+	public CMRespDto<?> initPost(){
+		return new CMRespDto<>(1, "목록보기완료", postService.게시글목록보기());
 	}
 }

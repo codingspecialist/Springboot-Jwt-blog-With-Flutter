@@ -2,6 +2,9 @@ package com.cos.authjwt.service;
 
 
 
+import java.util.List;
+
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,11 @@ public class UserService {
 	@Transactional
 	public User 회원가입(User user) {
 		return userRepository.save(user);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<User> 회원목록보기() {
+		return userRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
 	}
 	
 	@Transactional(readOnly = true)
