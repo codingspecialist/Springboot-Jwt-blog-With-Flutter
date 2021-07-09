@@ -1,15 +1,15 @@
 package com.cos.authjwt.domain.user;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,16 +29,15 @@ public class User {
 	@Column(length = 20,  unique = true)
 	private String username;
 	
-	@JsonIgnore
 	@Column(nullable = false)
 	private String password;
+	
 	@Column(nullable = false)
 	private String email;
 	
-	private LocalDateTime created;
+	@CreationTimestamp
+	private Timestamp created;
 	
-	@PrePersist // 디비에 INSERT 되기 직전에 실행
-	public void created() {
-		this.created = LocalDateTime.now();
-	}
+	@UpdateTimestamp
+	private Timestamp updated;
 }

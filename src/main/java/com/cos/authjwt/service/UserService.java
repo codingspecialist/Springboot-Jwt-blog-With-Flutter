@@ -28,4 +28,14 @@ public class UserService {
 				()-> new CustomApiException("해당 "+id+"는 존재하지 않습니다.")
 		);
 	}
+	
+	@Transactional
+	public User 회원수정(Integer id, User user) {
+		User userEntity = userRepository.findById(id).orElseThrow(
+				()-> new CustomApiException("해당 "+id+"는 존재하지 않습니다.")
+		);
+		userEntity.setPassword(user.getPassword());
+		userEntity.setEmail(user.getEmail());
+		return userEntity;
+	} // 더티 체킹
 }
