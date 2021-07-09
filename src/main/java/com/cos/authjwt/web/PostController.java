@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cos.authjwt.config.auth.LoginUser;
 import com.cos.authjwt.domain.post.Post;
+import com.cos.authjwt.domain.user.User;
 import com.cos.authjwt.service.PostService;
 import com.cos.authjwt.web.dto.CMRespDto;
 
@@ -31,7 +33,9 @@ public class PostController {
 	}
 	
 	@PostMapping("/post")
-	public CMRespDto<?> save(@RequestBody Post post){
+	public CMRespDto<?> save(@LoginUser User principal, @RequestBody Post post){
+		System.out.println("세션값 : "+principal);
+		post.setUser(principal);
 		return new CMRespDto<>(1, "글쓰기완료", postService.게시글쓰기(post));
 	}
 

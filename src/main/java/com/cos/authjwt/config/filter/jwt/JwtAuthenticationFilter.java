@@ -19,6 +19,7 @@ import com.cos.authjwt.domain.user.UserRepository;
 import com.cos.authjwt.web.dto.CMRespDto;
 import com.cos.authjwt.web.dto.user.LoginReqDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,6 +47,8 @@ public class JwtAuthenticationFilter implements Filter {
 		System.out.println("로그인 인증 필터 JwtAuthenticationFilter 동작 시작");
 
 		ObjectMapper om = new ObjectMapper();
+		//om.registerModule(new JavaTimeModule());
+		om.findAndRegisterModules();
 		LoginReqDto loginReqDto = om.readValue(req.getInputStream(), LoginReqDto.class);
 		System.out.println("다운 받은 데이터 : " + loginReqDto);
 		// 2. DB (select) -> if(ssar, 1234) 체크 -> 원형(1, ssar, 1234, ssar@nate.com,
@@ -63,11 +66,11 @@ public class JwtAuthenticationFilter implements Filter {
 		} else {
 			String jwtToken = JWT.create().withSubject(JwtProps.SUBJECT)
 					.withExpiresAt(new Date(System.currentTimeMillis() + JwtProps.EXPIRESAT))
-					.withClaim("id", "아이디")
+					.withClaim("id", principal.getId())
 					.sign(Algorithm.HMAC512(JwtProps.SECRET));
 
 			// 헤더 키값 = RFC문서
-			resp.setHeader(JwtProps.HEADER, JwtProps.AUTH + jwtToken);
+			resp.setHeader(JwtProps.HEADER, JwtProps.AUTH +jwtToken);
 			resp.setContentType("application/json; charset=utf-8");
 			
 			CMRespDto<User> cmRespDto = 

@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver{
-	private final HttpSession httpSession;
+	private final HttpSession session;
 	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -29,6 +29,8 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver{
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-		return httpSession.getAttribute("principal");
+		User principal = (User) session.getAttribute("principal");
+		System.out.println("resolveArgument :  이거 걸림"+principal);
+		return principal;
 	}
 }

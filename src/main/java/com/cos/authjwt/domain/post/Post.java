@@ -41,9 +41,9 @@ public class Post {
 	private User user;
 	
 	@CreationTimestamp
-	private Timestamp created;
+	private LocalDateTime created;
 	
 	@UpdateTimestamp
-	private Timestamp updated;
+	private LocalDateTime updated;
 	
 }

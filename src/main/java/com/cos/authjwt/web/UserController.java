@@ -41,7 +41,7 @@ public class UserController {
 		}else {
 			return new CMRespDto<>(-1, "로그인 되지 않았습니다.", null);
 		}
-	}
+	} 
 	
 	// Test 용 (실제 앱에서 사용안함)
 	@PutMapping("/user/{id}")

@@ -1,6 +1,7 @@
 package com.cos.authjwt.domain.user;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,8 +37,8 @@ public class User {
 	private String email;
 	
 	@CreationTimestamp
-	private Timestamp created;
+	private LocalDateTime created;
 	
 	@UpdateTimestamp
-	private Timestamp updated;
+	private LocalDateTime updated;
 }
