@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +28,8 @@ public class User {
 	
 	@Column(length = 20,  unique = true)
 	private String username;
+	
+	@JsonIgnore
 	@Column(nullable = false)
 	private String password;
 	@Column(nullable = false)

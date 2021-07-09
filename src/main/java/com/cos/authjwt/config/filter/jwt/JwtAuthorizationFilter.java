@@ -16,10 +16,17 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.cos.authjwt.domain.user.User;
+import com.cos.authjwt.domain.user.UserRepository;
+import com.cos.authjwt.handler.ex.CustomApiException;
+
+import lombok.RequiredArgsConstructor;
 
 // /post/**, /user/**,
+@RequiredArgsConstructor
 public class JwtAuthorizationFilter implements Filter {
 
+	private final UserRepository userRepository;
+	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
@@ -38,18 +45,19 @@ public class JwtAuthorizationFilter implements Filter {
 			out.flush();
 		} else {
 			jwtToken = jwtToken.replace(JwtProps.AUTH, "");
-			// System.out.println(jwtToken);
 
 			try {
 				DecodedJWT decodeJwt = JWT.require(Algorithm.HMAC512(JwtProps.SECRET)).build().verify(jwtToken);
 
 				Integer userId = decodeJwt.getClaim("id").asInt();
-				String role = decodeJwt.getClaim("role").asString();
-				//User loginUser = new User(userId, null, null, null, role);
+				User principal = userRepository.findById(userId).orElseThrow(
+						() -> new CustomApiException("해당 유저 아이디 "+userId+"는 존재하지 않습니다")
+				);
 
+				
 				HttpSession session = req.getSession();
-				session.setAttribute("principal", null);
-				chain.doFilter(req, resp);
+				session.setAttribute("principal", principal);
+				chain.doFilter(req, resp); // 다시 체인을 타게 해야 한다.
 			} catch (Exception e) {
 				PrintWriter out = resp.getWriter();
 				out.println("verify fail");

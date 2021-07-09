@@ -7,9 +7,15 @@ import org.springframework.context.annotation.Configuration;
 import com.cos.authjwt.config.filter.CorsFilter;
 import com.cos.authjwt.config.filter.jwt.JwtAuthenticationFilter;
 import com.cos.authjwt.config.filter.jwt.JwtAuthorizationFilter;
+import com.cos.authjwt.domain.user.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Configuration 
 public class FilterConfig {
+	
+	private final UserRepository userRepository;
 	
 	@Bean
 	public FilterRegistrationBean<CorsFilter> corsFilter(){
@@ -24,7 +30,7 @@ public class FilterConfig {
 	@Bean
 	public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilter(){
 		System.out.println("JwtAuthenticationFilter 등록됨");
-		FilterRegistrationBean<JwtAuthenticationFilter> bean = new FilterRegistrationBean<>(new JwtAuthenticationFilter());
+		FilterRegistrationBean<JwtAuthenticationFilter> bean = new FilterRegistrationBean<>(new JwtAuthenticationFilter(userRepository));
 		bean.addUrlPatterns("/login");
 		bean.setOrder(1); // 낮은 번호 부터 실행
 		return bean;
@@ -33,7 +39,7 @@ public class FilterConfig {
 	@Bean
 	public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilter(){
 		System.out.println("JwtAuthorizationFilter 등록됨");
-		FilterRegistrationBean<JwtAuthorizationFilter> bean = new FilterRegistrationBean<>(new JwtAuthorizationFilter());
+		FilterRegistrationBean<JwtAuthorizationFilter> bean = new FilterRegistrationBean<>(new JwtAuthorizationFilter(userRepository));
 		bean.addUrlPatterns("/post/*");
 		bean.addUrlPatterns("/user/*");
 		bean.setOrder(2); // 낮은 번호 부터 실행
