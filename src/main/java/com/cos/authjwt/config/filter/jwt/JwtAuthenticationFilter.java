@@ -2,6 +2,7 @@ package com.cos.authjwt.config.filter.jwt;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.servlet.Filter;
@@ -16,10 +17,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.cos.authjwt.domain.user.User;
 import com.cos.authjwt.domain.user.UserRepository;
+import com.cos.authjwt.util.CustomLocalDateTimeSerializer;
 import com.cos.authjwt.web.dto.CMRespDto;
 import com.cos.authjwt.web.dto.user.LoginReqDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,13 +49,12 @@ public class JwtAuthenticationFilter implements Filter {
 		System.out.println("로그인 인증 필터 JwtAuthenticationFilter 동작 시작");
 
 		ObjectMapper om = new ObjectMapper();
-		//om.registerModule(new JavaTimeModule());
-		om.findAndRegisterModules();
+		SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
+        om.registerModule(simpleModule);
+		
 		LoginReqDto loginReqDto = om.readValue(req.getInputStream(), LoginReqDto.class);
 		System.out.println("다운 받은 데이터 : " + loginReqDto);
-		// 2. DB (select) -> if(ssar, 1234) 체크 -> 원형(1, ssar, 1234, ssar@nate.com,
-		// guest)
-		//User userEntity = new User(1, "ssar", "1234", "ssar@nate.com", "GUEST");
 		
 		User principal =  userRepository.findByUsernameAndPassword(loginReqDto.getUsername(), loginReqDto.getPassword());
 		
@@ -73,6 +74,7 @@ public class JwtAuthenticationFilter implements Filter {
 			resp.setHeader(JwtProps.HEADER, JwtProps.AUTH +jwtToken);
 			resp.setContentType("application/json; charset=utf-8");
 			
+			principal.setPassword(null);
 			CMRespDto<User> cmRespDto = 
 					new CMRespDto<User>(1, "success", principal);
 			String cmRespDtoJson = om.writeValueAsString(cmRespDto);
