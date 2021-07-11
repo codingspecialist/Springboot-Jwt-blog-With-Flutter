@@ -34,19 +34,26 @@ public class UserController {
 	@GetMapping("/user/{id}")
 	public CMRespDto<?> userinfo(@PathVariable Integer id, @LoginUser User principal){
 		
-		User userEntity = userService.회원정보보기(id);
-		
-		if(principal != null) {
+		if(principal.getId() == id) {
+			User userEntity = userService.회원정보보기(id);
 			return new CMRespDto<>(1, "회원정보확인완료", userEntity);
 		}else {
-			return new CMRespDto<>(-1, "로그인 되지 않았습니다.", null);
+			return new CMRespDto<>(-1, "권한이 없습니다.", null);
 		}
+
 	} 
 	
 	// Test 용 (실제 앱에서 사용안함)
 	@PutMapping("/user/{id}")
 	public CMRespDto<?> userUpdate(@PathVariable Integer id, @RequestBody User user, @LoginUser User principal){
-		return new CMRespDto<>(1, "회원정보수정완료", userService.회원수정(id, user));
+		
+		if(principal.getId() == id) {
+			return new CMRespDto<>(1, "회원정보수정완료", userService.회원수정(id, user));
+		}else {
+			return new CMRespDto<>(-1, "권한이 없습니다.", null);
+		}
+		
+		
 	}
 	
 	@GetMapping("/init/user")
