@@ -12,9 +12,9 @@ const LoginPage = (props) => {
   });
 
   const login = (e) => {
-    console.log(e);
+    console.log("로그인동작", e);
     e.preventDefault(); // summit 액션을 차단!
-    fetch("http://localhost:8080/login", {
+    fetch("http://localhost:3000/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
