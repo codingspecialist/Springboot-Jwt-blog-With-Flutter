@@ -30,7 +30,8 @@ const LoginPage = (props) => {
       .then((res) => {
         if (res.code === 1) {
           console.log("통신 성공");
-          dispatcher(userLogin(res.data));
+          // sessionStorage.setItem("principal", res.data); 세션으로 정보관리
+          dispatcher(userLogin(res.data)); // 리덕스로 세션정보 관리
           //console.log(res.data);
           props.history.push("/");
           // 화면 동기화

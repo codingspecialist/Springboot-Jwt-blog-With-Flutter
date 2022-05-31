@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 const UserPage = () => {
+
+  const principal = useSelector(state => state.user);
+
   const [user, setUser] = useState({
     id: "",
     username: "",
-    email: "",
-    role: "",
+    email: ""
   });
 
+
+
   useEffect(() => {
-    fetch("http://localhost:3000/user", {
+
+
+    fetch(`http://localhost:3000/user/${principal.id}`, {
       method: "get",
       headers: {
         Authorization: localStorage.getItem("Authorization"),
@@ -18,7 +25,6 @@ const UserPage = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log("안녕");
         console.log(res);
         setUser(res.data);
       })
