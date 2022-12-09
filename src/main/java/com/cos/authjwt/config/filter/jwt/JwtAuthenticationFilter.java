@@ -18,8 +18,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.cos.authjwt.domain.user.User;
 import com.cos.authjwt.domain.user.UserRepository;
 import com.cos.authjwt.util.CustomLocalDateTimeSerializer;
+import com.cos.authjwt.util.CustomResponseUtil;
 import com.cos.authjwt.web.dto.CMRespDto;
 import com.cos.authjwt.web.dto.user.LoginReqDto;
+import com.cos.authjwt.web.dto.user.UserRespDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -37,50 +39,52 @@ public class JwtAuthenticationFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse resp = (HttpServletResponse) response;
+		ObjectMapper om = new ObjectMapper();
 
 		if (!req.getMethod().equals("POST")) {
-			resp.setContentType("text/plain; charset=utf-8");
-			PrintWriter out = resp.getWriter();
-			out.println("잘못된 요청입니다");
-			out.flush();
-			return;
+			try {
+				CMRespDto<User> cmRespDto = new CMRespDto<User>(-1, "Post로 요청해주세요", null);
+				CustomResponseUtil.response(resp, cmRespDto);
+				return;
+			} catch (Exception e) {
+				System.out.println("파싱 실패 :" + e.getMessage());
+			}
 		}
 
 		System.out.println("로그인 인증 필터 JwtAuthenticationFilter 동작 시작");
 
-		ObjectMapper om = new ObjectMapper();
 		SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
-        om.registerModule(simpleModule);
-		
+		simpleModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
+		om.registerModule(simpleModule);
+
 		LoginReqDto loginReqDto = om.readValue(req.getInputStream(), LoginReqDto.class);
 		System.out.println("다운 받은 데이터 : " + loginReqDto);
-		
-		User principal =  userRepository.findByUsernameAndPassword(loginReqDto.getUsername(), loginReqDto.getPassword());
-		
+
+		User principal = userRepository.findByUsernameAndPassword(loginReqDto.getUsername(), loginReqDto.getPassword());
+
 		if (principal == null) {
-			resp.setContentType("text/plain; charset=utf-8");
-			PrintWriter out = resp.getWriter();
-			out.println("인증 되지 않았습니다. 다시 인증해주세요");
-			out.flush();
+			try {
+				CMRespDto<User> cmRespDto = new CMRespDto<User>(-1, "인증되지 않았습니다", null);
+				CustomResponseUtil.response(resp, cmRespDto);
+				return;
+			} catch (Exception e) {
+				System.out.println("파싱 실패 :" + e.getMessage());
+			}
 			return;
 		} else {
-			String jwtToken = JWT.create().withSubject(JwtProps.SUBJECT)
-					.withExpiresAt(new Date(System.currentTimeMillis() + JwtProps.EXPIRESAT))
-					.withClaim("id", principal.getId())
-					.sign(Algorithm.HMAC512(JwtProps.SECRET));
+			String jwtToken = JwtProcess.create(principal.getId());
 
 			// 헤더 키값 = RFC문서
-			resp.setHeader(JwtProps.HEADER, JwtProps.AUTH +jwtToken);
-			resp.setContentType("application/json; charset=utf-8");
-			
+			resp.setHeader(JwtProps.HEADER, JwtProps.AUTH + jwtToken);
 			principal.setPassword(null);
-			CMRespDto<User> cmRespDto = 
-					new CMRespDto<User>(1, "success", principal);
-			String cmRespDtoJson = om.writeValueAsString(cmRespDto);
-			PrintWriter out = resp.getWriter();
-			out.print(cmRespDtoJson); // CMRespDto
-			out.flush();
+
+			try {
+				CMRespDto<UserRespDto> cmRespDto = new CMRespDto<>(1, "성공", new UserRespDto(principal));
+				CustomResponseUtil.response(resp, cmRespDto);
+				return;
+			} catch (Exception e) {
+				System.out.println("파싱 실패 :" + e.getMessage());
+			}
 		}
 
 	}

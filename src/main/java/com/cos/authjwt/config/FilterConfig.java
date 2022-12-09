@@ -12,40 +12,39 @@ import com.cos.authjwt.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration 
+@Configuration
 public class FilterConfig {
-	
+
 	private final UserRepository userRepository;
-	
-//	@Bean
-//	public FilterRegistrationBean<CorsFilter> corsFilter(){
-//		System.out.println("CORS 필터 등록");
-//		FilterRegistrationBean<CorsFilter> bean = 
-//				new FilterRegistrationBean<>(new CorsFilter());
-//		bean.addUrlPatterns("/*");
-//		bean.setOrder(0); // 낮은 번호부터 실행됨.
-//		return bean;
-//	}
-	
+
 	@Bean
-	public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilter(){
+	public FilterRegistrationBean<CorsFilter> corsFilter() {
+		System.out.println("CORS 필터 등록");
+		FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter());
+		bean.addUrlPatterns("/*");
+		bean.setOrder(0); // 낮은 번호부터 실행됨.
+		return bean;
+	}
+
+	@Bean
+	public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilter() {
 		System.out.println("JwtAuthenticationFilter 등록됨");
-		FilterRegistrationBean<JwtAuthenticationFilter> bean = new FilterRegistrationBean<>(new JwtAuthenticationFilter(userRepository));
+		FilterRegistrationBean<JwtAuthenticationFilter> bean = new FilterRegistrationBean<>(
+				new JwtAuthenticationFilter(userRepository));
 		bean.addUrlPatterns("/login");
 		bean.setOrder(1); // 낮은 번호 부터 실행
 		return bean;
 	}
-	
+
 	@Bean
-	public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilter(){
+	public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilter() {
 		System.out.println("JwtAuthorizationFilter 등록됨");
-		FilterRegistrationBean<JwtAuthorizationFilter> bean = new FilterRegistrationBean<>(new JwtAuthorizationFilter(userRepository));
+		FilterRegistrationBean<JwtAuthorizationFilter> bean = new FilterRegistrationBean<>(
+				new JwtAuthorizationFilter(userRepository));
 		bean.addUrlPatterns("/post/*");
 		bean.addUrlPatterns("/user/*");
 		bean.setOrder(2); // 낮은 번호 부터 실행
 		return bean;
 	}
-	
-	
-	
+
 }

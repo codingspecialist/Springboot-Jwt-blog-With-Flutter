@@ -5,9 +5,12 @@
 - 포트번호 8080 -> react의 3000번 포트로 요청하면 reverse-proxy 작동하게 개발모드에서만 세팅되어있음.
 
 ### 로그인, 회원정보보기 사용법
-- 로그인하면 redux로 로그인 정보 상태 관리함
-- localStorage에 JWT 담고
-- sessionStorage가 아닌 Redux에 로그인 정보 상태 관리중 (useSelector로 호출가능)
+- 로그인하면 static으로 로그인 정보 상태 관리함
+- shardPreparence에 JWT 담기
+
+### 업데이트
+- cors 필터 추가
+- json응답으로 공통화 적용
 
 ### 초기 데이터
 ```json

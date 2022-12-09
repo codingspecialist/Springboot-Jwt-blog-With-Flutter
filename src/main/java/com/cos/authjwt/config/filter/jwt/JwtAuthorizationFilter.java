@@ -18,6 +18,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.cos.authjwt.domain.user.User;
 import com.cos.authjwt.domain.user.UserRepository;
 import com.cos.authjwt.handler.ex.CustomApiException;
+import com.cos.authjwt.util.CustomResponseUtil;
+import com.cos.authjwt.web.dto.CMRespDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthorizationFilter implements Filter {
 
 	private final UserRepository userRepository;
-	
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
@@ -40,29 +42,34 @@ public class JwtAuthorizationFilter implements Filter {
 		System.out.println("토큰 : " + jwtToken);
 
 		if (jwtToken == null) {
-			PrintWriter out = resp.getWriter();
-			out.println("jwtToken not found"); 
-			out.flush();
+			try {
+				CMRespDto<User> cmRespDto = new CMRespDto<User>(-1, "JWT 토큰이 없습니다", null);
+				CustomResponseUtil.response(resp, cmRespDto);
+				return;
+			} catch (Exception e) {
+				System.out.println("파싱 실패 :" + e.getMessage());
+			}
 		} else {
 			jwtToken = jwtToken.replace(JwtProps.AUTH, "");
-			System.out.println("변경된 토큰 : "+jwtToken);
+			System.out.println("변경된 토큰 : " + jwtToken);
 			try {
-				DecodedJWT decodeJwt = JWT.require(Algorithm.HMAC512(JwtProps.SECRET)).build().verify(jwtToken);
-
-				Integer userId = decodeJwt.getClaim("id").asInt();
+				int userId = JwtProcess.verify(jwtToken);
 				User principal = userRepository.findById(userId).orElseThrow(
-						() -> new CustomApiException("해당 유저 아이디 "+userId+"는 존재하지 않습니다")
-				);
+						() -> new CustomApiException("해당 유저 아이디 " + userId + "는 존재하지 않습니다"));
 
-				System.out.println("인가 필터 : principal : "+principal);
+				System.out.println("인가 필터 : principal : " + principal);
 				HttpSession session = req.getSession();
 				session.setAttribute("principal", principal);
 				chain.doFilter(req, resp); // 다시 체인을 타게 해야 한다.
-			} catch (Exception e) {
-				e.printStackTrace();
-				PrintWriter out = resp.getWriter();
-				out.println("verify fail");
-				out.flush();
+			} catch (Exception e1) {
+				try {
+					CMRespDto<User> cmRespDto = new CMRespDto<User>(-1, "JWT 토큰 검증 실패", null);
+					CustomResponseUtil.response(resp, cmRespDto);
+					return;
+				} catch (Exception e) {
+					System.out.println("파싱 실패 :" + e.getMessage());
+				}
+				e1.printStackTrace();
 			}
 
 		}
