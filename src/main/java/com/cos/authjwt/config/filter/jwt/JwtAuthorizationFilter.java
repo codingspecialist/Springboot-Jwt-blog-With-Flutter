@@ -69,7 +69,6 @@ public class JwtAuthorizationFilter implements Filter {
 				} catch (Exception e) {
 					System.out.println("파싱 실패 :" + e.getMessage());
 				}
-				e1.printStackTrace();
 			}
 
 		}

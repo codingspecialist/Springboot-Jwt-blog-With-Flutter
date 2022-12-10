@@ -31,7 +31,7 @@ public class UserController {
 	private final UserService userService;
 	private final UserRepository userRepository;
 
-	@GetMapping("/user/jwtToken")
+	@GetMapping("/jwtToken")
 	public CMRespDto<?> jwtToken(HttpServletRequest request) {
 		String jwtToken = request.getHeader("authorization");
 		if (jwtToken == null) {
