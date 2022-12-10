@@ -37,6 +37,7 @@ public class UserController {
 		if (jwtToken == null) {
 			throw new CustomApiException("토큰이 헤더에 없습니다.");
 		}
+		System.out.println("토큰이 헤더 있습니다.");
 		jwtToken = jwtToken.replace(JwtProps.AUTH, "");
 		int userId = JwtProcess.verify(jwtToken);
 		User userEntity = userRepository.findById(userId).orElseThrow(() -> new CustomApiException("토큰 검증 실패"));
