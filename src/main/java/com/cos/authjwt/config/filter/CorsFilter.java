@@ -7,27 +7,29 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 // React 할려면 필요함 (Javascript 때문에)
-public class CorsFilter implements Filter{
+public class CorsFilter implements Filter {
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
 		System.out.println("CORS 필터 작동");
-		HttpServletResponse resp = (HttpServletResponse) response;
-		resp.setHeader("Access-Control-Allow-Origin", "*");
-		resp.setHeader("Access-Control-Allow-Methods", "*");
-		resp.setHeader("Access-Control-Allow-Headers", "*");
-		// 해당 헤더가 없으면 아래 7가지의 header값만 응답할 수 있다. 
-		//Cache-Control
-		//Content-Language
-		//Content-Length
-		//Content-Type
-		//Expires
-		//Last-Modified
-		//Pragma
-		resp.setHeader("Access-Control-Expose-Headers", "*");
-		chain.doFilter(request, response);
+		HttpServletRequest request = (HttpServletRequest) req;
+		HttpServletResponse response = (HttpServletResponse) res;
+
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Access-Control-Allow-Credentials", "true");
+		response.setHeader("Access-Control-Allow-Methods", "*");
+		response.setHeader("Access-Control-Max-Age", "3600");
+		response.setHeader("Access-Control-Allow-Headers",
+				"Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
+		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		} else {
+			chain.doFilter(req, res);
+		}
 	}
 }
