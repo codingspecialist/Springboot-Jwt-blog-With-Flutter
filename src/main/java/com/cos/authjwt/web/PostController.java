@@ -1,5 +1,6 @@
 package com.cos.authjwt.web;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import com.cos.authjwt.web.dto.CMRespDto;
 
 import lombok.RequiredArgsConstructor;
 
+@CrossOrigin
 @RequiredArgsConstructor
 @RestController
 public class PostController {

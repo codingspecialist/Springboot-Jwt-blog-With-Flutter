@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter implements Filter {
 		if (!req.getMethod().equals("POST")) {
 			try {
 				CMRespDto<User> cmRespDto = new CMRespDto<User>(-1, "Post로 요청해주세요", null);
-				CustomResponseUtil.response(resp, cmRespDto);
+				CustomResponseUtil.response(resp, cmRespDto, null);
 				return;
 			} catch (Exception e) {
 				System.out.println("파싱 실패 :" + e.getMessage());
@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter implements Filter {
 		if (principal == null) {
 			try {
 				CMRespDto<User> cmRespDto = new CMRespDto<User>(-1, "인증되지 않았습니다", null);
-				CustomResponseUtil.response(resp, cmRespDto);
+				CustomResponseUtil.response(resp, cmRespDto, null);
 				return;
 			} catch (Exception e) {
 				System.out.println("파싱 실패 :" + e.getMessage());
@@ -75,12 +75,13 @@ public class JwtAuthenticationFilter implements Filter {
 			String jwtToken = JwtProcess.create(principal.getId());
 
 			// 헤더 키값 = RFC문서
-			resp.setHeader(JwtProps.HEADER, JwtProps.AUTH + jwtToken);
+			// resp.setHeader(JwtProps.HEADER, JwtProps.AUTH + jwtToken);
 			principal.setPassword(null);
 
 			try {
 				CMRespDto<UserRespDto> cmRespDto = new CMRespDto<>(1, "성공", new UserRespDto(principal));
-				CustomResponseUtil.response(resp, cmRespDto);
+				cmRespDto.setToken(JwtProps.AUTH + jwtToken);
+				CustomResponseUtil.response(resp, cmRespDto, jwtToken);
 				return;
 			} catch (Exception e) {
 				System.out.println("파싱 실패 :" + e.getMessage());

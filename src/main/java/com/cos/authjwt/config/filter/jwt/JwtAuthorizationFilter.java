@@ -44,7 +44,7 @@ public class JwtAuthorizationFilter implements Filter {
 		if (jwtToken == null) {
 			try {
 				CMRespDto<User> cmRespDto = new CMRespDto<User>(-1, "JWT 토큰이 없습니다", null);
-				CustomResponseUtil.response(resp, cmRespDto);
+				CustomResponseUtil.response(resp, cmRespDto, null);
 				return;
 			} catch (Exception e) {
 				System.out.println("파싱 실패 :" + e.getMessage());
@@ -64,7 +64,7 @@ public class JwtAuthorizationFilter implements Filter {
 			} catch (Exception e1) {
 				try {
 					CMRespDto<User> cmRespDto = new CMRespDto<User>(-1, "JWT 토큰 검증 실패", null);
-					CustomResponseUtil.response(resp, cmRespDto);
+					CustomResponseUtil.response(resp, cmRespDto, null);
 					return;
 				} catch (Exception e) {
 					System.out.println("파싱 실패 :" + e.getMessage());
